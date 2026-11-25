@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Adds the 5 MCP tools to Claude Code (user scope). Keys are read from your
+# Adds the MCP tools to Claude Code (user scope). Keys are read from your
 # environment and never written to this repo:
 #   export PERPLEXITY_API_KEY=...   (https://www.perplexity.ai/settings/api)
 #   export FIRECRAWL_API_KEY=...    (https://www.firecrawl.dev/app/api-keys)
+#   export GSC_CREDENTIALS_PATH=/abs/path/service-account.json   (Search Console, service account)
+#     or GSC_OAUTH_CLIENT_SECRETS_FILE=/abs/path/client_secrets.json (Search Console, OAuth)
 #   bash install-mcp.sh
 set -uo pipefail
 command -v claude >/dev/null || { echo "Claude Code CLI not found (npm i -g @anthropic-ai/claude-code)"; exit 1; }
@@ -21,6 +23,26 @@ if [ -n "${FIRECRAWL_API_KEY:-}" ]; then
 else
   echo "skip firecrawl: set FIRECRAWL_API_KEY first"
 fi
+
+# --- SEO tools (need uv: https://docs.astral.sh/uv/) ---
+if command -v uvx >/dev/null; then
+  # GEO Optimizer: AI-search readiness audit (free, MIT, no key)
+  claude mcp add -s user geo-optimizer -- uvx --from "geo-optimizer-skill[mcp]" geo-mcp
+
+  # Google Search Console (read-only unless GSC_ALLOW_DESTRUCTIVE=true)
+  if [ -n "${GSC_CREDENTIALS_PATH:-}" ]; then
+    claude mcp add -s user gsc --env GSC_CREDENTIALS_PATH="$GSC_CREDENTIALS_PATH" --env GSC_SKIP_OAUTH=true -- uvx mcp-search-console
+  elif [ -n "${GSC_OAUTH_CLIENT_SECRETS_FILE:-}" ]; then
+    claude mcp add -s user gsc --env GSC_OAUTH_CLIENT_SECRETS_FILE="$GSC_OAUTH_CLIENT_SECRETS_FILE" -- uvx mcp-search-console
+  else
+    echo "skip gsc: set GSC_CREDENTIALS_PATH or GSC_OAUTH_CLIENT_SECRETS_FILE first"
+  fi
+else
+  echo "skip geo-optimizer and gsc: install uv first (https://docs.astral.sh/uv/)"
+fi
+
+# OpenSEO (keyword research, paid: DataForSEO key or OpenSEO credits) needs an
+# account, so it is not added here. Follow https://openseo.so/docs/mcp
 
 # HyperFrames is a skill pack (installed by install-skills.sh). In the Claude app
 # it is also available as the "HyperFrames by HeyGen" connector.
