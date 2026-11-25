@@ -1,13 +1,13 @@
 # Claude Toolkit
 
-My Claude Code setup: **14 skills** and **5 MCP tools**, installable with one command
+My Claude Code setup: **14 skills** and **7 MCP tools**, installable with one command
 each. This repo holds installers and config only. Every skill and server is
 fetched from its official source, so you always get the maintained version under
 its own license.
 
 > 🇹🇷 **Kısaca:**
 > - `bash install-skills.sh` 14 skill'i kurar.
-> - `bash install-mcp.sh` 5 MCP aracını Claude Code'a ekler. Önce anahtarları ortam değişkeni olarak ayarla.
+> - `bash install-mcp.sh` 7 MCP aracını Claude Code'a ekler. Önce anahtarları ortam değişkeni olarak ayarla.
 > - Bu repoyu Claude Code'da açarsan `.mcp.json` sayesinde MCP araçları projeye otomatik gelir.
 
 ## Quick start
@@ -20,6 +20,7 @@ bash install-skills.sh          # 14 skills, user-wide (needs Node.js 18+, Hyper
 
 export PERPLEXITY_API_KEY=...   # optional, paid per use
 export FIRECRAWL_API_KEY=...    # optional, free tier available
+export GSC_CREDENTIALS_PATH=... # optional, Search Console service account JSON
 bash install-mcp.sh             # adds the MCP servers to Claude Code
 ```
 
@@ -60,10 +61,16 @@ Each skill's `SKILL.md` lists what it needs.
 | Perplexity | Live, cited web search inside Claude | `PERPLEXITY_API_KEY` (paid) | [perplexityai/modelcontextprotocol](https://github.com/perplexityai/modelcontextprotocol) |
 | Firecrawl | Scrapes and crawls pages into clean markdown | `FIRECRAWL_API_KEY` (free tier) | [firecrawl/firecrawl-mcp-server](https://github.com/firecrawl/firecrawl-mcp-server) |
 | HyperFrames | Video and motion graphics (skill pack + Claude connector) | none | [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) |
+| GEO Optimizer | Scores a site 0–100 for AI-search readiness and suggests fixes (robots.txt, llms.txt, schema) | none | [Auriti-Labs/geo-optimizer-skill](https://github.com/Auriti-Labs/geo-optimizer-skill) |
+| Search Console | Queries, impressions, clicks and indexing from Google Search Console | `GSC_CREDENTIALS_PATH` (service account) | [AminForou/mcp-gsc](https://github.com/AminForou/mcp-gsc) |
 
 Two ways to use them:
 - **Claude Code, all projects:** `bash install-mcp.sh`. It adds the servers at user scope.
 - **Claude Code, this project only:** open the repo. [`.mcp.json`](.mcp.json) loads the servers, and keys come from your environment as `${PERPLEXITY_API_KEY}` and `${FIRECRAWL_API_KEY}`.
+
+GEO Optimizer and Search Console run through `uvx`, so [uv](https://docs.astral.sh/uv/) must be installed. Search Console is read-only by default. Give the service account read access to the property in Search Console.
+
+**OpenSEO** ([every-app/open-seo](https://github.com/every-app/open-seo), MIT) adds keyword research. It is not in the scripts: it needs an OpenSEO account (free trial credits) or your own DataForSEO key, both paid per use. Set it up with [openseo.so/docs/mcp](https://openseo.so/docs/mcp).
 
 In the Claude app, Firecrawl and HyperFrames are also available as connectors in Settings → Connectors.
 
@@ -78,5 +85,7 @@ In the Claude app, Firecrawl and HyperFrames are also available as connectors in
 Skill list inspired by Doruk Yalçınsoy's posts:
 - [Claude skill listesi](https://dorukyalcinsoy.com/blog/claude-skill-listesi/)
 - [Claude Code MCP araçları](https://dorukyalcinsoy.com/blog/claude-code-mcp-araclari/)
+
+SEO tools inspired by [Claude Code ile SEO: 3 araç](https://ulu-ai.com/kaynak/claude-code-seo/) (ULU-ai).
 
 All skills and servers belong to their authors and keep their own licenses. The scripts in this repo are MIT.
